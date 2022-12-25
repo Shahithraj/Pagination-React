@@ -1,23 +1,36 @@
 import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
+import Products from './components/Products';
+import Pagination from './components/Pagination';
 
 function App() {
+
+  
+  const [products,setProducts] = useState([]);
+  const [page,setPage] = useState(1);
+  const [totalPages,setTotalPage] = useState(0);
+  useEffect(() => {
+    fetchProducts();
+},[page])
+
+  const fetchProducts = async () => {
+    const res = await fetch(`https://dummyjson.com/products?limit=10&skip=${page*10-10}`)
+    const data = await res.json();
+    if(data && data.products) {
+      setProducts(data.products)
+      setTotalPage(data.total/10);
+    }
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {
+        products.length > 0 && 
+        <Products products={products} page={page} />
+      }
+      {
+        products.length > 0 && <Pagination totalPages={totalPages} products={products} page={page} setPage={setPage} />
+      }
     </div>
   );
 }
